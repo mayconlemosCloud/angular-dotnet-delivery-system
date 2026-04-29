@@ -1,0 +1,100 @@
+<div class="dashboard">
+
+  <div class="page-header">
+    <div>
+      <h1>Dashboard</h1>
+      <p class="subtitle">Visão geral do sistema</p>
+    </div>
+    <a mat-raised-button color="primary" routerLink="/orders">
+      <mat-icon>add</mat-icon>
+      Novo Pedido
+    </a>
+  </div>
+
+  <!-- ── KPI Cards ─────────────────────────────────────────────────────────── -->
+  <div class="kpi-grid">
+
+    <div class="kpi-card">
+      <div class="kpi-icon orders">
+        <mat-icon>receipt_long</mat-icon>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">Total de Pedidos</span>
+        <span class="kpi-value">{{ orders().length }}</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon deliveries">
+        <mat-icon>local_shipping</mat-icon>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">Total de Entregas</span>
+        <span class="kpi-value">{{ deliveries().length }}</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon today">
+        <mat-icon>today</mat-icon>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">Entregas Hoje</span>
+        <span class="kpi-value">{{ todayDeliveries() }}</span>
+      </div>
+    </div>
+
+    <div class="kpi-card" routerLink="/notifications" style="cursor:pointer">
+      <div class="kpi-icon notifs" [class.has-unread]="unreadCount() > 0">
+        <mat-icon>notifications</mat-icon>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">Notificações</span>
+        <span class="kpi-value">
+          {{ unreadCount() }}
+          @if (unreadCount() > 0) {
+            <span class="badge">não lidas</span>
+          }
+        </span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Recent Orders ─────────────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Pedidos Recentes</h2>
+      <a routerLink="/orders" class="see-all">Ver todos</a>
+    </div>
+
+    @if (loading()) {
+      <div class="empty-state">Carregando...</div>
+    } @else if (recentOrders().length === 0) {
+      <div class="empty-state">
+        <mat-icon>inbox</mat-icon>
+        <p>Nenhum pedido ainda. <a routerLink="/orders">Criar primeiro pedido</a></p>
+      </div>
+    } @else {
+      <div class="orders-table">
+        <div class="table-header">
+          <span>Número</span>
+          <span>Descrição</span>
+          <span>Valor</span>
+          <span>Cidade</span>
+          <span>Data</span>
+        </div>
+        @for (order of recentOrders(); track order.id) {
+          <div class="table-row">
+            <span class="order-number">{{ order.orderNumber }}</span>
+            <span class="description">{{ order.description }}</span>
+            <span class="value">{{ order.value | currency:'BRL' }}</span>
+            <span class="city">{{ order.deliveryAddress.city }}/{{ order.deliveryAddress.state }}</span>
+            <span class="date">{{ order.createdAt | date:'dd/MM/yy' }}</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+</div>

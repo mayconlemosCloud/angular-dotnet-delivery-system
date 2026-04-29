@@ -1,0 +1,65 @@
+<div class="shell">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
+  <aside class="sidenav" [class.collapsed]="!sidenavOpen()">
+
+    <div class="brand">
+      <div class="brand-logo">
+        <mat-icon>local_shipping</mat-icon>
+      </div>
+      @if (sidenavOpen()) {
+        <span class="brand-name">Delivery<strong>System</strong></span>
+      }
+    </div>
+
+    <nav class="nav">
+      @for (item of navItems; track item.route) {
+        <a class="nav-item"
+           [routerLink]="item.route"
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+           [matTooltip]="sidenavOpen() ? '' : item.label"
+           matTooltipPosition="right">
+          <mat-icon>{{ item.icon }}</mat-icon>
+          @if (sidenavOpen()) {
+            <span>{{ item.label }}</span>
+          }
+        </a>
+      }
+    </nav>
+
+    <div class="sidenav-bottom">
+      <button class="nav-item logout" (click)="logout()"
+              [matTooltip]="sidenavOpen() ? '' : 'Sair'"
+              matTooltipPosition="right">
+        <mat-icon>logout</mat-icon>
+        @if (sidenavOpen()) {
+          <span>Sair</span>
+        }
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ── Main ────────────────────────────────────────────────────────────── -->
+  <div class="main">
+
+    <header class="topbar">
+      <button class="menu-btn" (click)="toggleSidenav()">
+        <mat-icon>{{ sidenavOpen() ? 'menu_open' : 'menu' }}</mat-icon>
+      </button>
+
+      <div class="topbar-right">
+        <button class="avatar-btn" [matTooltip]="'Minha conta'">
+          <span class="avatar">{{ userInitial() }}</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="page">
+      <router-outlet />
+    </main>
+
+  </div>
+
+</div>

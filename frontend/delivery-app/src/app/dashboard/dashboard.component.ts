@@ -1,25 +1,44 @@
-import { Component } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
+import { Component, computed, inject, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { AuthService } from '../core/services/auth.service';
-import { inject } from '@angular/core';
+import { OrderService } from '../core/services/order.service';
+import { DeliveryService } from '../core/services/delivery.service';
+import { NotificationService } from '../core/services/notification.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [MatCardModule, MatIconModule, MatButtonModule],
-  template: `
-    <div style="display:flex; justify-content:center; align-items:center; height:100vh; background:#f0f2f5;">
-      <mat-card style="padding:32px; text-align:center; min-width:320px;">
-        <mat-icon style="font-size:48px; width:48px; height:48px; color:#1565c0;">check_circle</mat-icon>
-        <h2 style="margin:16px 0 8px;">Login realizado com sucesso!</h2>
-        <p style="color:#666; margin-bottom:24px;">Dashboard em construção...</p>
-        <button mat-stroked-button (click)="auth.logout()">Sair</button>
-      </mat-card>
-    </div>
-  `,
+  imports: [MatIconModule, MatButtonModule, RouterLink, CurrencyPipe, DatePipe],
+  templateUrl: './dashboard.component.html',
+  styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent {
-  auth = inject(AuthService);
+export class DashboardComponent implements OnInit {
+  private orderSvc    = inject(OrderService);
+  private deliverySvc = inject(DeliveryService);
+  private notifSvc    = inject(NotificationService);
+
+  readonly orders        = this.orderSvc.orders;
+  readonly deliveries    = this.deliverySvc.deliveries;
+  readonly unreadCount   = this.notifSvc.unreadCount;
+  readonly loading       = this.orderSvc.loading;
+
+  readonly todayDeliveries = computed(() => {
+    const today = new Date().toDateString();
+    return this.deliveries().filter(
+      d => new Date(d.deliveryDateTime).toDateString() === today
+    ).length;
+  });
+
+  readonly recentOrders = computed(() => this.orders().slice(0, 5));
+
+  ngOnInit() {
+    forkJoin([
+      this.orderSvc.load(),
+      this.deliverySvc.load(),
+      this.notifSvc.load(),
+    ]).subscribe();
+  }
 }

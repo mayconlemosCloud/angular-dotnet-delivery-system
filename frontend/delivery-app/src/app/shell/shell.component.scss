@@ -1,0 +1,209 @@
+// ── Variables ─────────────────────────────────────────────────────────────────
+$sidebar-width:      240px;
+$sidebar-collapsed:   64px;
+$sidebar-bg:         #0f172a;
+$sidebar-hover:      rgba(255,255,255,0.06);
+$sidebar-active-bg:  rgba(99,102,241,0.18);
+$sidebar-active-txt: #818cf8;
+$accent:             #6366f1;
+$topbar-h:            60px;
+
+// ── Shell wrapper ─────────────────────────────────────────────────────────────
+.shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+.sidenav {
+  width: $sidebar-width;
+  background: $sidebar-bg;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: width 0.25s ease;
+  overflow: hidden;
+
+  &.collapsed {
+    width: $sidebar-collapsed;
+
+    .brand-name { display: none; }
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  min-height: $topbar-h;
+
+  .brand-logo {
+    width: 32px;
+    height: 32px;
+    background: $accent;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    mat-icon {
+      color: white;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .brand-name {
+    color: white;
+    font-size: 15px;
+    white-space: nowrap;
+
+    strong { font-weight: 700; }
+  }
+}
+
+// ── Nav ───────────────────────────────────────────────────────────────────────
+.nav {
+  flex: 1;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  width: 100%;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    transition: color 0.15s;
+  }
+
+  &:hover {
+    background: $sidebar-hover;
+    color: rgba(255,255,255,0.9);
+    mat-icon { color: rgba(255,255,255,0.9); }
+  }
+
+  &.active {
+    background: $sidebar-active-bg;
+    color: $sidebar-active-txt;
+    mat-icon { color: $sidebar-active-txt; }
+  }
+
+  &.logout {
+    color: rgba(255,255,255,0.4);
+    &:hover {
+      background: rgba(239,68,68,0.12);
+      color: #f87171;
+      mat-icon { color: #f87171; }
+    }
+  }
+}
+
+.sidenav-bottom {
+  padding: 8px 8px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+// ── Main ─────────────────────────────────────────────────────────────────────
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// ── Topbar ────────────────────────────────────────────────────────────────────
+.topbar {
+  height: $topbar-h;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 12px;
+  flex-shrink: 0;
+
+  .menu-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    transition: background 0.15s, color 0.15s;
+
+    &:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    mat-icon { font-size: 22px; width: 22px; height: 22px; }
+  }
+
+  .topbar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .avatar-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: $accent;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    &:hover { opacity: 0.85; }
+  }
+}
+
+// ── Page content ──────────────────────────────────────────────────────────────
+.page {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px;
+}
