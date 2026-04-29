@@ -7,6 +7,7 @@ using FluentValidation.AspNetCore;
 using DeliverySystem.Api.Domain.Interfaces;
 using DeliverySystem.Api.Infrastructure.Repositories;
 using DeliverySystem.Api.Infrastructure.Settings;
+using DeliverySystem.Api.Domain.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
@@ -27,6 +28,7 @@ builder.Services.AddSingleton(sp =>
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -39,6 +41,7 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<OrderService>();
 
 // JWT Authentication
 var jwtSecret = builder.Configuration["JwtSettings:Secret"]!;

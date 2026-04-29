@@ -11,7 +11,15 @@ public class MappingProfile : Profile
         // User
         CreateMap<CreateUserRequest, User>()
             .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
-
         CreateMap<User, CreateUserResponse>();
+
+        // Address
+        CreateMap<AddressRequest, Address>();
+        CreateMap<Address, AddressResponse>();
+
+        // Order
+        CreateMap<CreateOrderRequest, Order>()
+            .ForMember(dest => dest.UserId, opt => opt.Ignore());
+        CreateMap<Order, CreateOrderResponse>();
     }
 }
