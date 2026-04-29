@@ -2,17 +2,24 @@ using AutoMapper;
 using DeliverySystem.Api.Application.DTOs;
 using DeliverySystem.Api.Domain.Entities;
 using DeliverySystem.Api.Domain.Interfaces;
+using DeliverySystem.Api.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace DeliverySystem.Api.Application.Services;
 
 public class NotificationService
 {
     private readonly INotificationRepository _notificationRepository;
+    private readonly IHubContext<NotificationHub> _hubContext;
     private readonly IMapper _mapper;
 
-    public NotificationService(INotificationRepository notificationRepository, IMapper mapper)
+    public NotificationService(
+        INotificationRepository notificationRepository,
+        IHubContext<NotificationHub> hubContext,
+        IMapper mapper)
     {
         _notificationRepository = notificationRepository;
+        _hubContext = hubContext;
         _mapper = mapper;
     }
 
@@ -26,6 +33,10 @@ public class NotificationService
         };
 
         await _notificationRepository.CreateAsync(notification);
+
+        var notificationMessage = new NotificationMessage(type, message, notification.CreatedAt);
+        await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notificationMessage);
+
         return notification;
     }
 

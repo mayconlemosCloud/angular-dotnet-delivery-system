@@ -2,17 +2,18 @@ using System.Text;
 using DeliverySystem.Api.Application.Mappings;
 using DeliverySystem.Api.Application.Services;
 using DeliverySystem.Api.Application.Validators;
-using DeliverySystem.Api.External.Clients;
-using FluentValidation;
-using FluentValidation.AspNetCore;
-using Refit;
 using DeliverySystem.Api.Domain.Interfaces;
+using DeliverySystem.Api.External.Clients;
+using DeliverySystem.Api.Hubs;
 using DeliverySystem.Api.Infrastructure.Repositories;
 using DeliverySystem.Api.Infrastructure.Settings;
-using DeliverySystem.Api.Domain.Interfaces;
+using Microsoft.AspNetCore.SignalR;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
+using Refit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +55,21 @@ builder.Services.AddScoped<NotificationService>();
 builder.Services.AddRefitClient<ICepClient>()
     .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://viacep.com.br"));
 
-// JWT Authentication
+// CORS — permite file:// e futuro frontend Angular
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+        policy.SetIsOriginAllowed(_ => true)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials());
+});
+
+// SignalR
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
+
+// JWT Authentication — com suporte a query string para WebSocket (SignalR)
 var jwtSecret = builder.Configuration["JwtSettings:Secret"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -68,6 +83,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
             ValidAudience = builder.Configuration["JwtSettings:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
+        };
+
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                    context.Token = accessToken;
+                return Task.CompletedTask;
+            }
         };
     });
 
@@ -91,7 +119,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<NotificationHub>("/hubs/notifications");
 app.Run();
