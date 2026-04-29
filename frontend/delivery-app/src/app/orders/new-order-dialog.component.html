@@ -1,0 +1,73 @@
+<div class="dialog-header">
+  <h2>Novo Pedido</h2>
+  <button mat-icon-button (click)="close()"><mat-icon>close</mat-icon></button>
+</div>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Descrição</mat-label>
+    <input matInput formControlName="description" placeholder="Ex: Notebook Dell" />
+    @if (form.get('description')?.hasError('required') && form.get('description')?.touched) {
+      <mat-error>Descrição obrigatória</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Valor (R$)</mat-label>
+    <input matInput formControlName="value" type="number" min="0.01" step="0.01" />
+    <mat-icon matSuffix>attach_money</mat-icon>
+    @if (form.get('value')?.hasError('required') && form.get('value')?.touched) {
+      <mat-error>Valor obrigatório</mat-error>
+    } @else if (form.get('value')?.hasError('min') && form.get('value')?.touched) {
+      <mat-error>Valor deve ser maior que zero</mat-error>
+    }
+  </mat-form-field>
+
+  <div class="cep-row">
+    <mat-form-field appearance="outline" class="cep-field">
+      <mat-label>CEP</mat-label>
+      <input matInput formControlName="zipCode" placeholder="00000-000" maxlength="9" />
+      @if (cepLoading()) {
+        <mat-spinner matSuffix diameter="18" />
+      } @else {
+        <mat-icon matSuffix>location_on</mat-icon>
+      }
+      @if (cepError()) {
+        <mat-error>{{ cepError() }}</mat-error>
+      } @else if (form.get('zipCode')?.hasError('pattern') && form.get('zipCode')?.touched) {
+        <mat-error>CEP inválido</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="number-field">
+      <mat-label>Número</mat-label>
+      <input matInput formControlName="number" />
+      @if (form.get('number')?.hasError('required') && form.get('number')?.touched) {
+        <mat-error>Obrigatório</mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  @if (address()) {
+    <div class="address-preview">
+      <mat-icon>check_circle</mat-icon>
+      <span>
+        {{ address()!.logradouro }}, {{ address()!.bairro }} —
+        {{ address()!.localidade }}/{{ address()!.uf }}
+      </span>
+    </div>
+  }
+
+  <div class="dialog-actions">
+    <button mat-stroked-button type="button" (click)="close()">Cancelar</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="orderSvc.loading()">
+      @if (orderSvc.loading()) {
+        <mat-spinner diameter="18" />
+      } @else {
+        Criar Pedido
+      }
+    </button>
+  </div>
+
+</form>
