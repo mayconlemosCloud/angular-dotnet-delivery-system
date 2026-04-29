@@ -2,8 +2,10 @@ using System.Text;
 using DeliverySystem.Api.Application.Mappings;
 using DeliverySystem.Api.Application.Services;
 using DeliverySystem.Api.Application.Validators;
+using DeliverySystem.Api.External.Clients;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Refit;
 using DeliverySystem.Api.Domain.Interfaces;
 using DeliverySystem.Api.Infrastructure.Repositories;
 using DeliverySystem.Api.Infrastructure.Settings;
@@ -42,6 +44,11 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<OrderService>();
+builder.Services.AddScoped<CepService>();
+
+// Refit — ViaCEP
+builder.Services.AddRefitClient<ICepClient>()
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://viacep.com.br"));
 
 // JWT Authentication
 var jwtSecret = builder.Configuration["JwtSettings:Secret"]!;

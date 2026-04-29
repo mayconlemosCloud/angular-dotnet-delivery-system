@@ -8,23 +8,37 @@ namespace DeliverySystem.Api.Application.Services;
 public class OrderService
 {
     private readonly IOrderRepository _orderRepository;
+    private readonly CepService _cepService;
     private readonly IMapper _mapper;
 
-    public OrderService(IOrderRepository orderRepository, IMapper mapper)
+    public OrderService(IOrderRepository orderRepository, CepService cepService, IMapper mapper)
     {
         _orderRepository = orderRepository;
+        _cepService = cepService;
         _mapper = mapper;
     }
 
-    public async Task<CreateOrderResponse> CreateAsync(CreateOrderRequest request, string userId)
+    public async Task<(CreateOrderResponse? Response, string? Error)> CreateAsync(CreateOrderRequest request, string userId)
     {
-        var order = _mapper.Map<Order>(request);
-        order.UserId = userId;
-        order.OrderNumber = GenerateOrderNumber();
+        var address = await _cepService.GetAddressAsync(
+            request.DeliveryAddress.ZipCode,
+            request.DeliveryAddress.Number);
+
+        if (address is null)
+            return (null, "CEP inválido ou não encontrado.");
+
+        var order = new Order
+        {
+            OrderNumber = GenerateOrderNumber(),
+            Description = request.Description,
+            Value = request.Value,
+            DeliveryAddress = address,
+            UserId = userId
+        };
 
         await _orderRepository.CreateAsync(order);
 
-        return _mapper.Map<CreateOrderResponse>(order);
+        return (_mapper.Map<CreateOrderResponse>(order), null);
     }
 
     public async Task<IEnumerable<CreateOrderResponse>> GetByUserIdAsync(string userId)
@@ -35,7 +49,6 @@ public class OrderService
 
     private static string GenerateOrderNumber()
     {
-        // PED-YYYYMMDD-XXXXX (ex: PED-20260429-A3F9C)
         var datePart = DateTime.UtcNow.ToString("yyyyMMdd");
         var randomPart = Guid.NewGuid().ToString("N")[..5].ToUpper();
         return $"PED-{datePart}-{randomPart}";

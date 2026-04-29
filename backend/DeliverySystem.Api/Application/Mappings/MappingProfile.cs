@@ -14,12 +14,9 @@ public class MappingProfile : Profile
         CreateMap<User, CreateUserResponse>();
 
         // Address
-        CreateMap<AddressRequest, Address>();
         CreateMap<Address, AddressResponse>();
 
         // Order
-        CreateMap<CreateOrderRequest, Order>()
-            .ForMember(dest => dest.UserId, opt => opt.Ignore());
         CreateMap<Order, CreateOrderResponse>();
     }
 }

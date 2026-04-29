@@ -22,8 +22,12 @@ public class OrdersController : ControllerBase
     public async Task<IActionResult> Create([FromBody] CreateOrderRequest request)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var response = await _orderService.CreateAsync(request, userId);
-        return CreatedAtAction(nameof(Create), new { id = response.Id }, response);
+        var (response, error) = await _orderService.CreateAsync(request, userId);
+
+        if (error is not null)
+            return BadRequest(new { message = error });
+
+        return CreatedAtAction(nameof(Create), new { id = response!.Id }, response);
     }
 
     [HttpGet]
