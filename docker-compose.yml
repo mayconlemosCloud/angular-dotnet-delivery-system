@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: delivery_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - delivery_net
+
+  api:
+    build:
+      context: ./backend/DeliverySystem.Api
+      dockerfile: Dockerfile
+    container_name: delivery_api
+    restart: unless-stopped
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoDbSettings__ConnectionString=mongodb://mongo:27017
+      - MongoDbSettings__DatabaseName=DeliverySystemDb
+      - JwtSettings__Secret=CHANGE_THIS_SECRET_32_CHARS_MIN!!
+      - JwtSettings__Issuer=DeliverySystem
+      - JwtSettings__Audience=DeliverySystemUsers
+      - JwtSettings__ExpirationHours=8
+    depends_on:
+      - mongo
+    networks:
+      - delivery_net
+
+volumes:
+  mongo_data:
+
+networks:
+  delivery_net:
+    driver: bridge
