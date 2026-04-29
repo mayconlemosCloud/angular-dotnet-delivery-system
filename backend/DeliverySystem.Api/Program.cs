@@ -32,6 +32,7 @@ builder.Services.AddSingleton(sp =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IDeliveryRepository, DeliveryRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -47,6 +48,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<CepService>();
 builder.Services.AddScoped<DeliveryService>();
+builder.Services.AddScoped<NotificationService>();
 
 // Refit — ViaCEP
 builder.Services.AddRefitClient<ICepClient>()

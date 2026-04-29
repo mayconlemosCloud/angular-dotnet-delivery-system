@@ -21,5 +21,8 @@ public class MappingProfile : Profile
 
         // Delivery
         CreateMap<Delivery, CreateDeliveryResponse>();
+
+        // Notification
+        CreateMap<Notification, NotificationResponse>();
     }
 }

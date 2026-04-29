@@ -9,12 +9,18 @@ public class OrderService
 {
     private readonly IOrderRepository _orderRepository;
     private readonly CepService _cepService;
+    private readonly NotificationService _notificationService;
     private readonly IMapper _mapper;
 
-    public OrderService(IOrderRepository orderRepository, CepService cepService, IMapper mapper)
+    public OrderService(
+        IOrderRepository orderRepository,
+        CepService cepService,
+        NotificationService notificationService,
+        IMapper mapper)
     {
         _orderRepository = orderRepository;
         _cepService = cepService;
+        _notificationService = notificationService;
         _mapper = mapper;
     }
 
@@ -37,6 +43,11 @@ public class OrderService
         };
 
         await _orderRepository.CreateAsync(order);
+
+        await _notificationService.CreateAsync(
+            userId,
+            "ORDER_CREATED",
+            $"Pedido {order.OrderNumber} criado com sucesso.");
 
         return (_mapper.Map<CreateOrderResponse>(order), null);
     }

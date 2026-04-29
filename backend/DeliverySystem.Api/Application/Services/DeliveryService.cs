@@ -9,15 +9,18 @@ public class DeliveryService
 {
     private readonly IDeliveryRepository _deliveryRepository;
     private readonly IOrderRepository _orderRepository;
+    private readonly NotificationService _notificationService;
     private readonly IMapper _mapper;
 
     public DeliveryService(
         IDeliveryRepository deliveryRepository,
         IOrderRepository orderRepository,
+        NotificationService notificationService,
         IMapper mapper)
     {
         _deliveryRepository = deliveryRepository;
         _orderRepository = orderRepository;
+        _notificationService = notificationService;
         _mapper = mapper;
     }
 
@@ -40,6 +43,11 @@ public class DeliveryService
         };
 
         await _deliveryRepository.CreateAsync(delivery);
+
+        await _notificationService.CreateAsync(
+            userId,
+            "DELIVERY_REGISTERED",
+            $"Entrega do pedido {delivery.OrderNumber} registrada para {delivery.DeliveryDateTime:dd/MM/yyyy HH:mm}.");
 
         return (_mapper.Map<CreateDeliveryResponse>(delivery), null, 201);
     }
