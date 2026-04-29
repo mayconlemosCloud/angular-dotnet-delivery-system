@@ -1,6 +1,21 @@
+using System.Text;
+using DeliverySystem.Api.Application.Mappings;
+using DeliverySystem.Api.Application.Services;
+using DeliverySystem.Api.Application.Validators;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using DeliverySystem.Api.Domain.Interfaces;
+using DeliverySystem.Api.Infrastructure.Repositories;
+using DeliverySystem.Api.Infrastructure.Settings;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Settings
+builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 // MongoDB
 var mongoConnectionString = builder.Configuration["MongoDbSettings:ConnectionString"]!;
@@ -10,10 +25,44 @@ builder.Services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoConnection
 builder.Services.AddSingleton(sp =>
     sp.GetRequiredService<IMongoClient>().GetDatabase(mongoDatabaseName));
 
-// Controllers + Swagger
+// Repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+// FluentValidation
+builder.Services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
+builder.Services.AddFluentValidationAutoValidation();
+
+// Services
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<UserService>();
+
+// JWT Authentication
+var jwtSecret = builder.Configuration["JwtSettings:Secret"]!;
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+            ValidAudience = builder.Configuration["JwtSettings:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+// Controllers + Swagger com JWT
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerWithJwt();
 
 var app = builder.Build();
 
@@ -28,5 +77,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.Run();
