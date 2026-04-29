@@ -18,5 +18,8 @@ public class MappingProfile : Profile
 
         // Order
         CreateMap<Order, CreateOrderResponse>();
+
+        // Delivery
+        CreateMap<Delivery, CreateDeliveryResponse>();
     }
 }
