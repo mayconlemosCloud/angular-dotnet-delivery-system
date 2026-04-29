@@ -10,17 +10,20 @@ public class DeliveryService
     private readonly IDeliveryRepository _deliveryRepository;
     private readonly IOrderRepository _orderRepository;
     private readonly NotificationService _notificationService;
+    private readonly DeliveryTrackingService _trackingService;
     private readonly IMapper _mapper;
 
     public DeliveryService(
         IDeliveryRepository deliveryRepository,
         IOrderRepository orderRepository,
         NotificationService notificationService,
+        DeliveryTrackingService trackingService,
         IMapper mapper)
     {
         _deliveryRepository = deliveryRepository;
         _orderRepository = orderRepository;
         _notificationService = notificationService;
+        _trackingService = trackingService;
         _mapper = mapper;
     }
 
@@ -48,6 +51,20 @@ public class DeliveryService
             userId,
             "DELIVERY_REGISTERED",
             $"Entrega do pedido {delivery.OrderNumber} registrada para {delivery.DeliveryDateTime:dd/MM/yyyy HH:mm}.");
+
+        // Use geocoded coordinates when available; fallback to a small offset from depot
+        var destLat = order.DeliveryAddress.Latitude
+            ?? DeliveryTrackingService.DefaultOriginLat + 0.05;
+        var destLon = order.DeliveryAddress.Longitude
+            ?? DeliveryTrackingService.DefaultOriginLon + 0.05;
+
+        _trackingService.EnqueueTracking(new TrackingJob(
+            delivery.OrderNumber,
+            userId,
+            DeliveryTrackingService.DefaultOriginLat,
+            DeliveryTrackingService.DefaultOriginLon,
+            destLat,
+            destLon));
 
         return (_mapper.Map<CreateDeliveryResponse>(delivery), null, 201);
     }

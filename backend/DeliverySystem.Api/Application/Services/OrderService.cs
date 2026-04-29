@@ -9,17 +9,20 @@ public class OrderService
 {
     private readonly IOrderRepository _orderRepository;
     private readonly CepService _cepService;
+    private readonly GeocodingService _geocodingService;
     private readonly NotificationService _notificationService;
     private readonly IMapper _mapper;
 
     public OrderService(
         IOrderRepository orderRepository,
         CepService cepService,
+        GeocodingService geocodingService,
         NotificationService notificationService,
         IMapper mapper)
     {
         _orderRepository = orderRepository;
         _cepService = cepService;
+        _geocodingService = geocodingService;
         _notificationService = notificationService;
         _mapper = mapper;
     }
@@ -32,6 +35,13 @@ public class OrderService
 
         if (address is null)
             return (null, "CEP inválido ou não encontrado.");
+
+        var coords = await _geocodingService.GeocodeAsync(address);
+        if (coords.HasValue)
+        {
+            address.Latitude = coords.Value.Lat;
+            address.Longitude = coords.Value.Lon;
+        }
 
         var order = new Order
         {

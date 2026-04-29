@@ -48,12 +48,27 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<CepService>();
+builder.Services.AddScoped<GeocodingService>();
 builder.Services.AddScoped<DeliveryService>();
 builder.Services.AddScoped<NotificationService>();
+
+// DeliveryTrackingService — singleton so DeliveryService (scoped) can enqueue jobs,
+// and IHostedService runs the background loop on the same instance
+builder.Services.AddSingleton<DeliveryTrackingService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<DeliveryTrackingService>());
 
 // Refit — ViaCEP
 builder.Services.AddRefitClient<ICepClient>()
     .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://viacep.com.br"));
+
+// Refit — Nominatim (free geocoding, no API key required)
+builder.Services.AddRefitClient<INominatimClient>()
+    .ConfigureHttpClient(c =>
+    {
+        c.BaseAddress = new Uri("https://nominatim.openstreetmap.org");
+        // Required by Nominatim ToS: identify the application
+        c.DefaultRequestHeaders.Add("User-Agent", "DeliverySystem/1.0 (test)");
+    });
 
 // CORS — permite file:// e futuro frontend Angular
 builder.Services.AddCors(options =>
