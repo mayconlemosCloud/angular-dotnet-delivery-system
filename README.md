@@ -8,13 +8,13 @@ Sistema de pedidos, registro de entregas e notificações em tempo real.
 
 ### Frontend
 
-![Demonstração do Frontend](video/front.mp4)
+![Demonstração do Frontend](video/front.webp)
 
 Cadastro, login, criação de pedido com busca de CEP, registro de entrega e notificações em tempo real.
 
 ### API
 
-![Demonstração da API](video/api.mp4)
+![Demonstração da API](video/api.webp)
 
 Endpoints REST via Swagger: autenticação JWT, criação de pedido, registro de entrega e notificações.
 
