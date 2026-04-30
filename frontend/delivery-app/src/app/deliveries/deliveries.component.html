@@ -1,0 +1,47 @@
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <h1>Entregas</h1>
+      <p class="subtitle">{{ deliveries().length }} entrega(s) registrada(s)</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="openNew()">
+      <mat-icon>add</mat-icon>
+      Registrar Entrega
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading"><mat-spinner diameter="40" /></div>
+  } @else if (deliveries().length === 0) {
+    <div class="empty">
+      <mat-icon>local_shipping</mat-icon>
+      <p>Nenhuma entrega registrada.</p>
+      <button mat-raised-button color="primary" (click)="openNew()">Registrar primeira entrega</button>
+    </div>
+  } @else {
+    <div class="table-card">
+
+      <div class="table-header">
+        <span>Pedido</span>
+        <span>Data/Hora de Entrega</span>
+        <span>Registrado em</span>
+        <span>Status</span>
+      </div>
+
+      @for (delivery of deliveries(); track delivery.id) {
+        <div class="table-row">
+          <span class="order-number">{{ delivery.orderNumber }}</span>
+          <span class="datetime">{{ delivery.deliveryDateTime | date:'dd/MM/yyyy HH:mm' }}</span>
+          <span class="created">{{ delivery.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+          <span class="status" [class.delivered]="isDelivered(delivery.deliveryDateTime)">
+            <span class="dot"></span>
+            {{ isDelivered(delivery.deliveryDateTime) ? 'Entregue' : 'Agendada' }}
+          </span>
+        </div>
+      }
+
+    </div>
+  }
+
+</div>

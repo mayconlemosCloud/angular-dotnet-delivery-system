@@ -1,0 +1,43 @@
+<div class="dialog-header">
+  <h2>Registrar Entrega</h2>
+  <button mat-icon-button (click)="close()"><mat-icon>close</mat-icon></button>
+</div>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Número do Pedido</mat-label>
+    <input matInput formControlName="orderNumber" placeholder="PED-20260429-XXXXX" />
+    <mat-icon matSuffix>receipt_long</mat-icon>
+    @if (form.get('orderNumber')?.hasError('required') && form.get('orderNumber')?.touched) {
+      <mat-error>Número do pedido obrigatório</mat-error>
+    } @else if (form.get('orderNumber')?.hasError('pattern') && form.get('orderNumber')?.touched) {
+      <mat-error>Formato inválido (ex: PED-20260429-AB1C2)</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Data e Hora de Entrega</mat-label>
+    <input matInput formControlName="deliveryDateTime" type="datetime-local" />
+    <mat-icon matSuffix>schedule</mat-icon>
+    @if (form.get('deliveryDateTime')?.hasError('required') && form.get('deliveryDateTime')?.touched) {
+      <mat-error>Data de entrega obrigatória</mat-error>
+    }
+  </mat-form-field>
+
+  @if (deliverySvc.error()) {
+    <p class="error-msg">{{ deliverySvc.error() }}</p>
+  }
+
+  <div class="dialog-actions">
+    <button mat-stroked-button type="button" (click)="close()">Cancelar</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="deliverySvc.loading()">
+      @if (deliverySvc.loading()) {
+        <mat-spinner diameter="18" />
+      } @else {
+        Registrar
+      }
+    </button>
+  </div>
+
+</form>

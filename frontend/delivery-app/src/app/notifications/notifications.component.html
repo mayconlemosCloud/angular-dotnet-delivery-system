@@ -1,0 +1,58 @@
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <h1>Notificações</h1>
+      <p class="subtitle">
+        {{ unreadCount() }} não lida(s) de {{ notifications().length }} total
+      </p>
+    </div>
+    @if (unreadCount() > 0) {
+      <button mat-stroked-button (click)="markAllAsRead()">
+        <mat-icon>done_all</mat-icon>
+        Marcar todas como lidas
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="loading"><mat-spinner diameter="40" /></div>
+  } @else if (notifications().length === 0) {
+    <div class="empty">
+      <mat-icon>notifications_none</mat-icon>
+      <p>Nenhuma notificação ainda.</p>
+      <span>Elas aparecerão aqui quando você criar pedidos ou registrar entregas.</span>
+    </div>
+  } @else {
+    <div class="list">
+      @for (notif of notifications(); track notif.id) {
+        <div class="notif-item" [class.unread]="!notif.isRead">
+
+          <div class="notif-icon" [class.order]="notif.type === 'ORDER_CREATED'" [class.delivery]="notif.type === 'DELIVERY_REGISTERED'">
+            <mat-icon>{{ iconFor(notif.type) }}</mat-icon>
+          </div>
+
+          <div class="notif-content">
+            <p class="message">{{ notif.message }}</p>
+            <span class="time">{{ notif.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+
+          <div class="notif-actions">
+            @if (!notif.isRead) {
+              <button mat-icon-button matTooltip="Marcar como lida" (click)="markAsRead(notif.id)">
+                <mat-icon>check_circle_outline</mat-icon>
+              </button>
+            } @else {
+              <span class="read-badge">
+                <mat-icon>check_circle</mat-icon>
+                Lida
+              </span>
+            }
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+</div>

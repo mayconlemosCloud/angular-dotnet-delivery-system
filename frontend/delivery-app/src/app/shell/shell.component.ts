@@ -1,9 +1,12 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatBadgeModule } from '@angular/material/badge';
 import { AuthService } from '../core/services/auth.service';
+import { NotificationService } from '../core/services/notification.service';
+import { SignalRService } from '../core/services/signalr.service';
 
 interface NavItem {
   label: string;
@@ -16,13 +19,15 @@ interface NavItem {
   standalone: true,
   imports: [
     RouterOutlet, RouterLink, RouterLinkActive,
-    MatIconModule, MatTooltipModule,
+    MatIconModule, MatTooltipModule, MatBadgeModule,
   ],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',
 })
-export class ShellComponent {
+export class ShellComponent implements OnInit, OnDestroy {
   private auth        = inject(AuthService);
+  private signalR     = inject(SignalRService);
+  private notifSvc    = inject(NotificationService);
   private breakpoints = inject(BreakpointObserver);
 
   readonly navItems: NavItem[] = [
@@ -32,9 +37,9 @@ export class ShellComponent {
     { label: 'Notificações', icon: 'notifications',  route: '/notifications' },
   ];
 
-  readonly sidenavOpen = signal(true);
+  readonly sidenavOpen  = signal(true);
+  readonly unreadCount  = this.notifSvc.unreadCount;
 
-  // Pega a inicial do e-mail armazenado no token (fallback: 'U')
   readonly userInitial = computed(() => {
     const token = this.auth.getToken();
     if (!token) return 'U';
@@ -56,11 +61,21 @@ export class ShellComponent {
     });
   }
 
+  async ngOnInit() {
+    await this.signalR.start();
+    this.notifSvc.load().subscribe();
+  }
+
+  async ngOnDestroy() {
+    await this.signalR.stop();
+  }
+
   toggleSidenav() {
     this.sidenavOpen.update(v => !v);
   }
 
   logout() {
+    this.signalR.stop();
     this.auth.logout();
   }
 }

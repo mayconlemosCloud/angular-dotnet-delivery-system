@@ -24,6 +24,14 @@ export const routes: Routes = [
         path: 'orders',
         loadComponent: () => import('./orders/orders.component').then(m => m.OrdersComponent),
       },
+      {
+        path: 'deliveries',
+        loadComponent: () => import('./deliveries/deliveries.component').then(m => m.DeliveriesComponent),
+      },
+      {
+        path: 'notifications',
+        loadComponent: () => import('./notifications/notifications.component').then(m => m.NotificationsComponent),
+      },
     ],
   },
   { path: '**', redirectTo: 'dashboard' },
