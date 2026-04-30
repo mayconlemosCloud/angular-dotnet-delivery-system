@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(npm --version)",
-      "Bash(npx @angular/cli version)",
-      "Bash(npx @angular/cli new delivery-app --directory frontend/delivery-app --routing --style=scss --skip-git --skip-tests)"
-    ]
-  }
-}
