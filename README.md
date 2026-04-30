@@ -10,8 +10,8 @@ Sistema de pedidos, registro de entregas e notificações em tempo real.
 
 | Vídeo | Descrição |
 |-------|-----------|
-| [▶ Demonstração do Frontend](video/front.mkv) | Cadastro, login, criação de pedido com busca de CEP, registro de entrega e notificações em tempo real |
-| [▶ Demonstração da API](video/api.mkv) | Endpoints REST via Swagger: autenticação JWT, criação de pedido, registro de entrega e notificações |
+| [▶ Demonstração do Frontend](video/front.mp4) | Cadastro, login, criação de pedido com busca de CEP, registro de entrega e notificações em tempo real |
+| [▶ Demonstração da API](video/api.mp4) | Endpoints REST via Swagger: autenticação JWT, criação de pedido, registro de entrega e notificações |
 
 
 ## Tecnologias utilizadas
