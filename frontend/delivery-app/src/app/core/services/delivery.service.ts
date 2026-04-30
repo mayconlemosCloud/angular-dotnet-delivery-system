@@ -3,10 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, EMPTY, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+export type DeliveryStatus = 'IN_ROUTE' | 'DELIVERED';
+
 export interface Delivery {
   id: string;
   orderNumber: string;
   deliveryDateTime: string;
+  status: DeliveryStatus;
   createdAt: string;
 }
 

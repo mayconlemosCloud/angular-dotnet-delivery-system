@@ -7,4 +7,5 @@ public interface IDeliveryRepository
     Task<Delivery?> GetByOrderNumberAsync(string orderNumber);
     Task<IEnumerable<Delivery>> GetByUserIdAsync(string userId);
     Task CreateAsync(Delivery delivery);
+    Task UpdateStatusAsync(string orderNumber, string status);
 }

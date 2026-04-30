@@ -39,7 +39,7 @@
 
 .table-header {
   display: grid;
-  grid-template-columns: 2fr 2fr 2fr 1fr;
+  grid-template-columns: 2fr 2fr 2fr 2fr 1.2fr;
   padding: 10px 20px;
   background: #f8fafc;
   font-size: 12px;
@@ -51,7 +51,7 @@
 
 .table-row {
   display: grid;
-  grid-template-columns: 2fr 2fr 2fr 1fr;
+  grid-template-columns: 2fr 2fr 2fr 2fr 1.2fr;
   padding: 14px 20px;
   font-size: 14px;
   color: #334155;
@@ -66,19 +66,70 @@
   .created      { color: #94a3b8; font-size: 13px; }
 }
 
+// ── Progresso ─────────────────────────────────────────────────────────────────
+.progress-cell {
+  display: flex;
+  align-items: center;
+}
+
+.progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  cursor: default;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #818cf8);
+    border-radius: 3px;
+    transition: width 1s ease;
+  }
+}
+
+.progress-pct {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6366f1;
+  min-width: 30px;
+}
+
+.progress-done {
+  font-size: 12px;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+.progress-na {
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+// ── Status ────────────────────────────────────────────────────────────────────
 .status {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-size: 12px;
   font-weight: 600;
-  color: #f59e0b;
 
   .dot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #f59e0b;
+  }
+
+  &.in-route {
+    color: #2563eb;
+    .dot { background: #2563eb; }
   }
 
   &.delivered {

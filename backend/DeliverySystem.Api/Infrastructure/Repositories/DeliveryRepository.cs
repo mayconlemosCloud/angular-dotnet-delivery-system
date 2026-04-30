@@ -14,17 +14,18 @@ public class DeliveryRepository : IDeliveryRepository
     }
 
     public async Task<Delivery?> GetByOrderNumberAsync(string orderNumber)
-    {
-        return await _collection.Find(d => d.OrderNumber == orderNumber).FirstOrDefaultAsync();
-    }
+        => await _collection.Find(d => d.OrderNumber == orderNumber).FirstOrDefaultAsync();
 
     public async Task<IEnumerable<Delivery>> GetByUserIdAsync(string userId)
-    {
-        return await _collection.Find(d => d.UserId == userId).ToListAsync();
-    }
+        => await _collection.Find(d => d.UserId == userId).ToListAsync();
 
     public async Task CreateAsync(Delivery delivery)
+        => await _collection.InsertOneAsync(delivery);
+
+    public async Task UpdateStatusAsync(string orderNumber, string status)
     {
-        await _collection.InsertOneAsync(delivery);
+        var filter = Builders<Delivery>.Filter.Eq(d => d.OrderNumber, orderNumber);
+        var update = Builders<Delivery>.Update.Set(d => d.Status, status);
+        await _collection.UpdateOneAsync(filter, update);
     }
 }

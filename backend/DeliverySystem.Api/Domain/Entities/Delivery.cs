@@ -11,9 +11,16 @@ public class Delivery
 
     public string OrderNumber { get; set; } = string.Empty;
     public DateTime DeliveryDateTime { get; set; }
+    public string Status { get; set; } = DeliveryStatus.InRoute;
 
     [BsonRepresentation(BsonType.ObjectId)]
     public string UserId { get; set; } = string.Empty;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+}
+
+public static class DeliveryStatus
+{
+    public const string InRoute   = "IN_ROUTE";
+    public const string Delivered = "DELIVERED";
 }
